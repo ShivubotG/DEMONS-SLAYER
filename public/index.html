@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demons Slayer - Message Automation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --darker: #111827;
+            --light: #f3f4f6;
+            --gray: #6b7280;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.8rem;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+        }
+        
+        .card-title i {
+            font-size: 1.6rem;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--light);
+            font-weight: 500;
+        }
+        
+        .input-with-file {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        
+        .input-with-file textarea {
+            flex: 1;
+        }
+        
+        textarea, input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--light);
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+        }
+        
+        textarea:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .file-upload-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            width: 180px;
+        }
+        
+        .file-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            background: var(--primary);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            justify-content: center;
+        }
+        
+        .file-label:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .file-name {
+            font-size: 0.8rem;
+            color: var(--gray);
+            text-align: center;
+            word-break: break-all;
+        }
+        
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .config-item input {
+            text-align: center;
+        }
+        
+        .task-id-display {
+            text-align: center;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: var(--secondary);
+            display: none;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(124, 58, 237, 0.3);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+        }
+        
+        .btn-danger:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+        
+        .btn-warning:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .logs-container {
+            margin-top: 30px;
+        }
+        
+        .logs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .logs-box {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            height: 350px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            line-height: 1.4;
+        }
+        
+        .log-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        
+        .log-time {
+            color: var(--secondary);
+            font-weight: bold;
+        }
+        
+        .log-info { color: #60a5fa; }
+        .log-success { color: #34d399; }
+        .log-warning { color: #fbbf24; }
+        .log-error { color: #f87171; }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .status-item {
+            text-align: center;
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .status-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .status-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--light);
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .running-tasks {
+            margin-top: 20px;
+        }
+        
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .task-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 15px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .task-item.stopped {
+            border-left-color: var(--danger);
+        }
+        
+        .task-item.completed {
+            border-left-color: var(--secondary);
+        }
+        
+        .task-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .task-id {
+            font-weight: bold;
+            color: var(--light);
+        }
+        
+        .task-status {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        .task-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .icon-btn:hover {
+            background: var(--danger);
+            transform: scale(1.1);
+        }
+        
+        .stop-all-btn {
+            margin-top: 10px;
+            width: 100%;
+        }
+        
+        .glow {
+            animation: glow 2s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 0 10px var(--primary); }
+            to { box-shadow: 0 0 20px var(--secondary); }
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-robot"></i> DEMONS SLAYER</h1>
+            <p class="subtitle">Advanced Message Automation Tool - Development Server</p>
+        </header>
+        
+        <div class="main-content">
+            <!-- Left Column - Inputs -->
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-cogs"></i> Configuration</h2>
+                
+                <div class="task-id-display" id="taskIdDisplay">
+                    Task ID: <span id="taskIdValue"></span>
+                </div>
+                
+                <div class="input-group">
+                    <label><i class="fas fa-cookie-bite"></i> 1. Cookies</label>
+                    <div class="input-with-file">
+                        <textarea id="cookiesInput" placeholder="Paste cookies here (one per line)&#10;Format: name=value&#10;Example: c_user=123456789&#10;xs=abc123..."></textarea>
+                        <div class="file-upload-container">
+                            <label class="file-label">
+                                <i class="fas fa-upload"></i> Upload File
+                                <input type="file" id="cookiesFile" class="file-input" accept=".txt,.csv">
+                            </label>
+                            <div class="file-name" id="cookiesFileName">No file selected</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label><i class="fas fa-comment-dots"></i> 2. Messages</label>
+                    <div class="input-with-file">
+                        <textarea id="messagesInput" placeholder="Enter messages (one per line)&#10;Each line will be sent as a separate message&#10;Emojis will be added automatically"></textarea>
+                        <div class="file-upload-container">
+                            <label class="file-label">
+                                <i class="fas fa-upload"></i> Upload File
+                                <input type="file" id="messagesFile" class="file-input" accept=".txt,.csv">
+                            </label>
+                            <div class="file-name" id="messagesFileName">No file selected</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label><i class="fas fa-users"></i> 3. Conversation IDs</label>
+                    <textarea id="conversationInput" placeholder="Enter conversation IDs (one per line)&#10;You can get these from Facebook Messenger URLs:&#10;facebook.com/messages/t/CONVERSATION_ID"></textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label><i class="fas fa-sliders-h"></i> Advanced Settings</label>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>4. Batch Count</label>
+                            <input type="number" id="batchCount" value="1" min="1" max="100">
+                        </div>
+                        <div class="config-item">
+                            <label>5. Batch Delay (s)</label>
+                            <input type="number" id="batchDelay" value="5" min="1" max="300">
+                        </div>
+                        <div class="config-item">
+                            <label>6. Time Delay (s)</label>
+                            <input type="number" id="timeDelay" value="10" min="1" max="600">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="buttons">
+                    <button class="btn btn-primary" id="startBtn" onclick="startTask()">
+                        <i class="fas fa-play"></i> 7. Start Task
+                    </button>
+                </div>
+                
+                <div class="status-bar" id="statusBar" style="display: none;">
+                    <div class="status-item">
+                        <div class="status-label">Status</div>
+                        <div class="status-value" id="taskStatus">Running</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Progress</div>
+                        <div class="status-value" id="taskProgress">0%</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Success</div>
+                        <div class="status-value" id="taskSuccess">0</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Failed</div>
+                        <div class="status-value" id="taskFailed">0</div>
+                    </div>
+                </div>
+                <div class="progress-bar" id="progressBar" style="display: none;">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                
+                <div class="running-tasks" id="runningTasksContainer" style="display: none;">
+                    <h3 class="card-title"><i class="fas fa-tasks"></i> Running Tasks</h3>
+                    <div class="task-list" id="taskList">
+                        <!-- Tasks will be added here dynamically -->
+                    </div>
+                    <button class="btn btn-warning stop-all-btn" onclick="stopAllTasks()">
+                        <i class="fas fa-stop-circle"></i> Stop All Tasks
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Right Column - Logs -->
+            <div class="card">
+                <div class="logs-header">
+                    <h2 class="card-title"><i class="fas fa-terminal"></i> Live Logs</h2>
+                    <div>
+                        <button class="btn btn-danger" onclick="clearLogs()" style="padding: 8px 15px; font-size: 0.9rem; margin-right: 10px;">
+                            <i class="fas fa-trash"></i> Clear Logs
+                        </button>
+                        <button class="btn btn-warning" onclick="refreshLogs()" style="padding: 8px 15px; font-size: 0.9rem;">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                <div class="logs-box" id="logsBox">
+                    <div class="log-entry">
+                        <span class="log-time">[00:00:00]</span>
+                        <span class="log-info"> System initialized. Ready to start tasks.</span>
+                    </div>
+                </div>
+                
+                <div class="status-bar" style="margin-top: 20px;">
+                    <div class="status-item">
+                        <div class="status-label">Active Tasks</div>
+                        <div class="status-value" id="activeTasks">0</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Total Tasks</div>
+                        <div class="status-value" id="totalTasks">0</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Server Time</div>
+                        <div class="status-value" id="serverTime">00:00:00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Demons Slayer v1.0.0 | Development Server | Not for production use</p>
+            <p style="margin-top: 5px; font-size: 0.8rem;">
+                <i class="fas fa-exclamation-triangle"></i> Use responsibly and comply with Facebook's Terms of Service
+            </p>
+        </footer>
+    </div>
+    
+    <script>
+        let currentTaskId = null;
+        let refreshInterval = null;
+        let logRefreshInterval = null;
+        let tasksRefreshInterval = null;
+        
+        // Update server time
+        function updateServerTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+            document.getElementById('serverTime').textContent = timeStr;
+        }
+        
+        setInterval(updateServerTime, 1000);
+        updateServerTime();
+        
+        // File upload handlers
+        function setupFileUpload(fileInputId, textareaId, fileNameId) {
+            const fileInput = document.getElementById(fileInputId);
+            const textarea = document.getElementById(textareaId);
+            const fileNameDisplay = document.getElementById(fileNameId);
+            
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    fileNameDisplay.textContent = file.name;
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        textarea.value = e.target.result;
+                        addLog(`File "${file.name}" loaded successfully`, 'success');
+                    };
+                    reader.onerror = function(e) {
+                        fileNameDisplay.textContent = 'Error reading file';
+                        addLog(`Error reading file: ${file.name}`, 'error');
+                    };
+                    reader.readAsText(file);
+                } else {
+                    fileNameDisplay.textContent = 'No file selected';
+                }
+            });
+        }
+        
+        // Initialize file uploads
+        setupFileUpload('cookiesFile', 'cookiesInput', 'cookiesFileName');
+        setupFileUpload('messagesFile', 'messagesInput', 'messagesFileName');
+        
+        // Log management
+        function addLog(message, type = 'info') {
+            const logsBox = document.getElementById('logsBox');
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.innerHTML = `
+                <span class="log-time">[${timeStr}]</span>
+                <span class="log-${type}"> ${message}</span>
+            `;
+            
+            logsBox.appendChild(logEntry);
+            
+            // Keep only last 100 logs
+            const logEntries = logsBox.querySelectorAll('.log-entry');
+            if (logEntries.length > 100) {
+                logEntries[0].remove();
+            }
+            
+            logsBox.scrollTop = logsBox.scrollHeight;
+        }
+        
+        function clearLogs() {
+            document.getElementById('logsBox').innerHTML = `
+                <div class="log-entry">
+                    <span class="log-time">[00:00:00]</span>
+                    <span class="log-info"> Logs cleared.</span>
+                </div>
+            `;
+        }
+        
+        function refreshLogs() {
+            if (currentTaskId) {
+                fetchTaskLogs(currentTaskId);
+            }
+        }
+        
+        // Task management
+        async function startTask() {
+            const cookies = document.getElementById('cookiesInput').value.trim();
+            const messages = document.getElementById('messagesInput').value.trim();
+            const conversationId = document.getElementById('conversationInput').value.trim();
+            const batchCount = document.getElementById('batchCount').value;
+            const batchDelay = document.getElementById('batchDelay').value;
+            const timeDelay = document.getElementById('timeDelay').value;
+            
+            if (!cookies) {
+                addLog('Please enter cookies', 'error');
+                alert('Please enter cookies');
+                return;
+            }
+            if (!messages) {
+                addLog('Please enter messages', 'error');
+                alert('Please enter messages');
+                return;
+            }
+            if (!conversationId) {
+                addLog('Please enter conversation IDs', 'error');
+                alert('Please enter conversation IDs');
+                return;
+            }
+            
+            const startBtn = document.getElementById('startBtn');
+            
+            startBtn.disabled = true;
+            startBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Starting...';
+            
+            try {
+                const response = await fetch('/api/start-task', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        cookies,
+                        messages,
+                        conversation_id: conversationId,
+                        batch_count: batchCount,
+                        batch_delay: batchDelay,
+                        time_delay: timeDelay
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentTaskId = data.taskId;
+                    
+                    // Show task ID
+                    document.getElementById('taskIdValue').textContent = data.taskId;
+                    document.getElementById('taskIdDisplay').style.display = 'block';
+                    
+                    // Show status bar
+                    document.getElementById('statusBar').style.display = 'flex';
+                    document.getElementById('progressBar').style.display = 'block';
+                    
+                    // Start refreshing task status
+                    startRefresh();
+                    
+                    addLog(data.message, 'success');
+                    addLog(`Task ID: ${data.taskId}`, 'info');
+                    addLog(`Total operations: ${data.details.totalOperations}`, 'info');
+                    
+                    // Enable start button after 3 seconds
+                    setTimeout(() => {
+                        startBtn.disabled = false;
+                        startBtn.innerHTML = '<i class="fas fa-play"></i> Start Task';
+                    }, 3000);
+                    
+                } else {
+                    addLog('Error: ' + data.error, 'error');
+                    alert('Error: ' + data.error);
+                    startBtn.disabled = false;
+                    startBtn.innerHTML = '<i class="fas fa-play"></i> Start Task';
+                }
+                
+            } catch (error) {
+                addLog('Network error: ' + error.message, 'error');
+                alert('Network error: ' + error.message);
+                startBtn.disabled = false;
+                startBtn.innerHTML = '<i class="fas fa-play"></i> Start Task';
+            }
+        }
+        
+        async function stopTask(taskId) {
+            if (!taskId) return;
+            
+            try {
+                const response = await fetch(`/api/stop-task/${taskId}`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    addLog(data.message, 'warning');
+                    updateTasksList();
+                } else {
+                    addLog('Error stopping task: ' + data.error, 'error');
+                }
+            } catch (error) {
+                addLog('Error stopping task: ' + error.message, 'error');
+            }
+        }
+        
+        async function stopAllTasks() {
+            if (!confirm('Are you sure you want to stop ALL running tasks?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/stop-all-tasks', {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    addLog(data.message, 'warning');
+                    updateTasksList();
+                } else {
+                    addLog('Error stopping tasks: ' + data.error, 'error');
+                }
+            } catch (error) {
+                addLog('Error stopping tasks: ' + error.message, 'error');
+            }
+        }
+        
+        function startRefresh() {
+            // Clear existing intervals
+            if (refreshInterval) clearInterval(refreshInterval);
+            if (logRefreshInterval) clearInterval(logRefreshInterval);
+            if (tasksRefreshInterval) clearInterval(tasksRefreshInterval);
+            
+            // Refresh task status every 3 seconds
+            refreshInterval = setInterval(refreshTaskStatus, 3000);
+            
+            // Refresh logs every 2 seconds
+            logRefreshInterval = setInterval(refreshTaskLogs, 2000);
+            
+            // Refresh tasks list every 5 seconds
+            tasksRefreshInterval = setInterval(updateTasksList, 5000);
+            
+            // Initial refresh
+            refreshTaskStatus();
+            refreshTaskLogs();
+            updateTasksList();
+            updateServerStatus();
+        }
+        
+        async function refreshTaskStatus() {
+            if (!currentTaskId) return;
+            
+            try {
+                const response = await fetch(`/api/task/${currentTaskId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const task = data.task;
+                    
+                    document.getElementById('taskStatus').textContent = task.status;
+                    document.getElementById('taskProgress').textContent = task.progress + '%';
+                    document.getElementById('taskSuccess').textContent = task.success;
+                    document.getElementById('taskFailed').textContent = task.failed;
+                    document.getElementById('progressFill').style.width = task.progress + '%';
+                    
+                    // If task is completed or stopped, show completion message
+                    if (task.status === 'completed' || task.status === 'stopped' || task.status === 'error') {
+                        if (task.status === 'completed') {
+                            addLog(`Task ${task.id} completed! Success: ${task.success}, Failed: ${task.failed}`, 'success');
+                        }
+                        // Stop refreshing this specific task
+                        clearInterval(refreshInterval);
+                        refreshInterval = null;
+                    }
+                }
+            } catch (error) {
+                console.error('Error refreshing task status:', error);
+            }
+        }
+        
+        async function refreshTaskLogs() {
+            if (!currentTaskId) return;
+            
+            try {
+                const response = await fetch(`/api/logs/${currentTaskId}`);
+                const data = await response.json();
+                
+                if (data.success && data.logs.length > 0) {
+                    const logsBox = document.getElementById('logsBox');
+                    const existingLogs = Array.from(logsBox.querySelectorAll('.log-entry'))
+                        .map(el => el.textContent);
+                    
+                    // Only add new logs
+                    data.logs.forEach(log => {
+                        if (!existingLogs.includes(log)) {
+                            const logEntry = document.createElement('div');
+                            logEntry.className = 'log-entry';
+                            logEntry.textContent = log;
+                            logsBox.appendChild(logEntry);
+                        }
+                    });
+                    
+                    // Keep only last 100 logs
+                    const logEntries = logsBox.querySelectorAll('.log-entry');
+                    if (logEntries.length > 100) {
+                        for (let i = 0; i < logEntries.length - 100; i++) {
+                            logEntries[i].remove();
+                        }
+                    }
+                    
+                    logsBox.scrollTop = logsBox.scrollHeight;
+                }
+            } catch (error) {
+                console.error('Error refreshing logs:', error);
+            }
+        }
+        
+        async function fetchTaskLogs(taskId) {
+            try {
+                const response = await fetch(`/api/logs/${taskId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const logsBox = document.getElementById('logsBox');
+                    logsBox.innerHTML = '';
+                    
+                    data.logs.forEach(log => {
+                        const logEntry = document.createElement('div');
+                        logEntry.className = 'log-entry';
+                        logEntry.textContent = log;
+                        logsBox.appendChild(logEntry);
+                    });
+                    
+                    logsBox.scrollTop = logsBox.scrollHeight;
+                }
+            } catch (error) {
+                console.error('Error fetching logs:', error);
+            }
+        }
+        
+        async function updateTasksList() {
+            try {
+                const response = await fetch('/api/all-tasks');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const taskList = document.getElementById('taskList');
+                    const runningTasksContainer = document.getElementById('runningTasksContainer');
+                    
+                    // Update task counts
+                    document.getElementById('activeTasks').textContent = data.active;
+                    document.getElementById('totalTasks').textContent = data.total;
+                    
+                    // Show/hide running tasks container
+                    if (data.tasks.length > 0) {
+                        runningTasksContainer.style.display = 'block';
+                    } else {
+                        runningTasksContainer.style.display = 'none';
+                    }
+                    
+                    // Clear existing tasks
+                    taskList.innerHTML = '';
+                    
+                    // Add tasks to list
+                    data.tasks.forEach(task => {
+                        const taskItem = document.createElement('div');
+                        taskItem.className = `task-item ${task.status}`;
+                        taskItem.innerHTML = `
+                            <div class="task-info">
+                                <div class="task-id">${task.id}</div>
+                                <div class="task-status">
+                                    ${task.status} | Progress: ${task.progress}% | 
+                                    Success: ${task.success} | Failed: ${task.failed}
+                                </div>
+                            </div>
+                            <div class="task-actions">
+                                ${task.status === 'running' ? 
+                                    `<button class="icon-btn" onclick="stopTask('${task.id}')" title="Stop Task">
+                                        <i class="fas fa-stop"></i>
+                                    </button>` : 
+                                    ''
+                                }
+                            </div>
+                        `;
+                        taskList.appendChild(taskItem);
+                    });
+                }
+            } catch (error) {
+                console.error('Error updating tasks list:', error);
+            }
+        }
+        
+        async function updateServerStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                
+                if (data) {
+                    document.getElementById('activeTasks').textContent = data.activeTasks;
+                    document.getElementById('totalTasks').textContent = data.totalTasks;
+                }
+            } catch (error) {
+                console.error('Error updating server status:', error);
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('System initialized. Ready to start tasks.', 'success');
+            updateServerStatus();
+            updateTasksList();
+            
+            // Check server status periodically
+            setInterval(updateServerStatus, 10000);
+            setInterval(updateTasksList, 15000);
+            
+            // Test file uploads
+            console.log('File upload handlers initialized');
+        });
+    </script>
+</body>
+</html>
