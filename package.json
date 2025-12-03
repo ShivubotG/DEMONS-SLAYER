@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "express": "5.1.0",
-    "puppeteer": "24.1.5",
+    "puppeteer": "24.31.0",
     "express-rate-limit": "7.1.5",
     "cors": "2.8.5",
     "helmet": "7.1.0",
