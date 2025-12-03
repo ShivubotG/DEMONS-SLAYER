@@ -1,35 +1,44 @@
-# Official Playwright image with Node.js and all browser dependencies
-FROM mcr.microsoft.com/playwright:v1.47.0-jammy
+# Dockerfile
+FROM node:18-alpine
 
-# Set working directory
+# Install Chromium and necessary dependencies
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    freetype-dev \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont \
+    font-noto-emoji \
+    dumb-init
+
+# Set environment variables for Puppeteer
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+# Create app directory
 WORKDIR /app
 
-# Copy package files first for better caching
+# Copy package files
 COPY package*.json ./
 
-# Install Node.js dependencies
+# Install dependencies
 RUN npm ci --only=production
 
-# Copy application code
+# Copy app source
 COPY . .
 
-# Create logs and uploads directories
-RUN mkdir -p logs uploads
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
 
-# Set environment variables
-ENV NODE_ENV=production
-ENV PORT=3000
-ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+# Change ownership
+RUN chown -R nodejs:nodejs /app
 
-# Expose port
+# Switch to non-root user
+USER nodejs
+
 EXPOSE 3000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:3000/ || exit 1
-
-# Run as non-root user
-USER pwuser
-
-# Start the application
-CMD ["npm", "start"]
+CMD ["dumb-init", "node", "server.js"]
