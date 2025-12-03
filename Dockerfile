@@ -1,7 +1,7 @@
 # Use Node.js LTS version
 FROM node:18-bullseye
 
-# Install dependencies for Puppeteer
+# Install dependencies for Puppeteer and Chrome
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
@@ -49,8 +49,12 @@ WORKDIR /usr/src/app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --omit=dev
+# Install dependencies - FIXED: Using npm install instead of npm ci if lockfile doesn't exist
+RUN if [ -f package-lock.json ]; then \
+      npm ci --only=production; \
+    else \
+      npm install --only=production; \
+    fi
 
 # Install puppeteer chromium
 RUN npx puppeteer browsers install chrome
@@ -71,4 +75,4 @@ USER appuser
 EXPOSE 3000
 
 # Start the application
-CMD [ "node", "server.js" ]
+CMD [ "npm", "run", "dev" ]
