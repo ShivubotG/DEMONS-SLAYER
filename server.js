@@ -1,0 +1,490 @@
+const express = require('express');
+const puppeteer = require('puppeteer');
+const fs = require('fs').promises;
+const path = require('path');
+const { v4: uuidv4 } = require('uuid');
+const multer = require('multer');
+const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const app = express();
+
+// Configuration
+const PORT = process.env.PORT || 3000;
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+// Middleware
+app.use(helmet());
+app.use(cors());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.static('public'));
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100 // limit each IP to 100 requests per windowMs
+});
+app.use('/api/', limiter);
+
+// Multer setup for file uploads
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: MAX_FILE_SIZE },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === 'text/plain' || file.mimetype === 'text/csv') {
+      cb(null, true);
+    } else {
+      cb(new Error('Only .txt and .csv files are allowed'));
+    }
+  }
+});
+
+// Global state
+const tasks = new Map();
+const logs = new Map();
+
+// Utility functions
+function generateTaskId() {
+  const randomNum = Math.floor(1000 + Math.random() * 9000);
+  return `h4rsh_${randomNum}`;
+}
+
+function addLog(taskId, message) {
+  const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
+  const logMessage = `[${timestamp}] ${message}`;
+  
+  if (!logs.has(taskId)) {
+    logs.set(taskId, []);
+  }
+  
+  const taskLogs = logs.get(taskId);
+  taskLogs.push(logMessage);
+  
+  // Keep only last 100 logs
+  if (taskLogs.length > 100) {
+    taskLogs.shift();
+  }
+  
+  // Also log to console
+  console.log(`[${taskId}] ${message}`);
+}
+
+function parseCookies(cookieString) {
+  if (!cookieString) return [];
+  
+  const cookies = [];
+  const lines = cookieString.split('\n');
+  
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    
+    const parts = trimmed.split(';');
+    const firstPart = parts[0].trim();
+    
+    if (firstPart.includes('=')) {
+      const [name, value] = firstPart.split('=');
+      if (name && value) {
+        cookies.push({
+          name: name.trim(),
+          value: value.trim(),
+          domain: '.facebook.com',
+          path: '/',
+          secure: true,
+          httpOnly: name.trim() === 'c_user' || name.trim() === 'xs'
+        });
+      }
+    }
+  }
+  
+  return cookies;
+}
+
+function enhanceMessage(message) {
+  const emojis = ['😈', '⚡', '🔥', '💀', '👿', '🤖', '🎭', '👹', '💥', '🦾'];
+  const randomEmoji = () => emojis[Math.floor(Math.random() * emojis.length)];
+  
+  const words = message.split(' ');
+  const enhancedWords = [];
+  
+  for (let i = 0; i < words.length; i++) {
+    enhancedWords.push(words[i]);
+    if (Math.random() < 0.3 && i < words.length - 1) {
+      enhancedWords.push(randomEmoji());
+    }
+  }
+  
+  if (Math.random() < 0.5) {
+    enhancedWords.unshift(randomEmoji());
+  }
+  if (Math.random() < 0.5) {
+    enhancedWords.push(randomEmoji());
+  }
+  
+  return enhancedWords.join(' ');
+}
+
+// Routes
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/api/status', (req, res) => {
+  res.json({
+    status: 'running',
+    version: '1.0.0',
+    timestamp: new Date().toISOString()
+  });
+});
+
+app.post('/api/upload', upload.fields([
+  { name: 'cookies_file', maxCount: 1 },
+  { name: 'messages_file', maxCount: 1 }
+]), (req, res) => {
+  try {
+    const result = {};
+    
+    if (req.files?.cookies_file) {
+      result.cookies = req.files.cookies_file[0].buffer.toString();
+    }
+    
+    if (req.files?.messages_file) {
+      result.messages = req.files.messages_file[0].buffer.toString();
+    }
+    
+    res.json({ success: true, data: result });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/start-task', async (req, res) => {
+  try {
+    const {
+      cookies,
+      messages,
+      conversation_id,
+      batch_count = 1,
+      batch_delay = 5,
+      time_delay = 10
+    } = req.body;
+    
+    if (!cookies || !messages || !conversation_id) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Missing required fields' 
+      });
+    }
+    
+    const taskId = generateTaskId();
+    
+    // Parse inputs
+    const parsedCookies = parseCookies(cookies);
+    const messageList = messages.split('\n').filter(m => m.trim());
+    const conversationList = conversation_id.split('\n').filter(c => c.trim());
+    
+    if (parsedCookies.length === 0) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'No valid cookies found' 
+      });
+    }
+    
+    // Create task
+    const task = {
+      id: taskId,
+      status: 'running',
+      progress: 0,
+      total: batch_count * messageList.length * conversationList.length,
+      completed: 0,
+      success: 0,
+      failed: 0,
+      startTime: new Date().toISOString(),
+      cookies: parsedCookies,
+      messages: messageList,
+      conversations: conversationList,
+      batch_count: parseInt(batch_count),
+      batch_delay: parseInt(batch_delay),
+      time_delay: parseInt(time_delay)
+    };
+    
+    tasks.set(taskId, task);
+    logs.set(taskId, []);
+    
+    addLog(taskId, `Task started with ID: ${taskId}`);
+    addLog(taskId, `Cookies: ${parsedCookies.length}`);
+    addLog(taskId, `Messages: ${messageList.length}`);
+    addLog(taskId, `Conversations: ${conversationList.length}`);
+    
+    // Start task in background
+    processTask(taskId);
+    
+    res.json({ 
+      success: true, 
+      taskId,
+      message: `Task ${taskId} started successfully!` 
+    });
+    
+  } catch (error) {
+    console.error('Error starting task:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+app.get('/api/task/:taskId', (req, res) => {
+  const taskId = req.params.taskId;
+  const task = tasks.get(taskId);
+  
+  if (!task) {
+    return res.status(404).json({ 
+      success: false, 
+      error: 'Task not found' 
+    });
+  }
+  
+  res.json({
+    success: true,
+    task: {
+      id: task.id,
+      status: task.status,
+      progress: task.progress,
+      total: task.total,
+      completed: task.completed,
+      success: task.success,
+      failed: task.failed,
+      startTime: task.startTime
+    }
+  });
+});
+
+app.get('/api/logs/:taskId', (req, res) => {
+  const taskId = req.params.taskId;
+  const taskLogs = logs.get(taskId) || [];
+  
+  res.json({
+    success: true,
+    logs: taskLogs.slice(-50) // Return last 50 logs
+  });
+});
+
+app.post('/api/stop-task/:taskId', (req, res) => {
+  const taskId = req.params.taskId;
+  const task = tasks.get(taskId);
+  
+  if (!task) {
+    return res.status(404).json({ 
+      success: false, 
+      error: 'Task not found' 
+    });
+  }
+  
+  task.status = 'stopped';
+  addLog(taskId, 'Task stopped by user');
+  
+  res.json({ 
+    success: true, 
+    message: `Task ${taskId} stopped` 
+  });
+});
+
+// Puppeteer function
+async function sendFacebookMessage(cookies, conversationId, message, taskId) {
+  let browser = null;
+  
+  try {
+    addLog(taskId, `Launching browser...`);
+    
+    browser = await puppeteer.launch({
+      headless: true,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--disable-gpu'
+      ],
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || null
+    });
+    
+    const page = await browser.newPage();
+    
+    // Set viewport
+    await page.setViewport({ width: 1366, height: 768 });
+    
+    // Set user agent
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+    
+    // Add cookies
+    if (cookies && cookies.length > 0) {
+      addLog(taskId, `Adding ${cookies.length} cookies...`);
+      await page.setCookie(...cookies);
+    }
+    
+    // Navigate to Facebook messages
+    addLog(taskId, `Navigating to conversation: ${conversationId}`);
+    await page.goto(`https://www.facebook.com/messages/t/${conversationId}`, {
+      waitUntil: 'networkidle2',
+      timeout: 30000
+    });
+    
+    // Wait for page to load
+    await page.waitForTimeout(5000);
+    
+    // Check if logged in
+    const isLoggedIn = await page.evaluate(() => {
+      return document.querySelector('a[aria-label="Profile"]') !== null ||
+             document.querySelector('[data-testid="royal_profile"]') !== null;
+    });
+    
+    if (!isLoggedIn) {
+      throw new Error('Not logged in - check cookies');
+    }
+    
+    addLog(taskId, 'Successfully logged in');
+    
+    // Find message input
+    const messageInput = await page.waitForSelector('div[contenteditable="true"][role="textbox"]', {
+      timeout: 10000
+    });
+    
+    if (!messageInput) {
+      throw new Error('Message input not found');
+    }
+    
+    // Click and type message
+    await messageInput.click();
+    await page.waitForTimeout(1000);
+    
+    // Clear any existing text
+    await page.evaluate((el) => {
+      el.innerHTML = '';
+    }, messageInput);
+    
+    await page.waitForTimeout(500);
+    
+    // Type the message
+    addLog(taskId, `Typing message: ${message.substring(0, 50)}...`);
+    await messageInput.type(message, { delay: 50 });
+    
+    // Find and click send button
+    const sendButton = await page.waitForSelector('div[aria-label="Press Enter to send"]', {
+      timeout: 5000
+    });
+    
+    if (sendButton) {
+      await sendButton.click();
+    } else {
+      // Fallback: press Enter
+      await messageInput.press('Enter');
+    }
+    
+    addLog(taskId, 'Message sent successfully!');
+    await page.waitForTimeout(2000);
+    
+    await browser.close();
+    return true;
+    
+  } catch (error) {
+    addLog(taskId, `Error: ${error.message}`);
+    
+    if (browser) {
+      await browser.close();
+    }
+    
+    return false;
+  }
+}
+
+// Task processor
+async function processTask(taskId) {
+  const task = tasks.get(taskId);
+  if (!task) return;
+  
+  try {
+    for (let batch = 0; batch < task.batch_count; batch++) {
+      if (task.status === 'stopped') break;
+      
+      addLog(taskId, `Starting batch ${batch + 1}/${task.batch_count}`);
+      
+      for (const conversation of task.conversations) {
+        if (task.status === 'stopped') break;
+        
+        for (const message of task.messages) {
+          if (task.status === 'stopped') break;
+          
+          const enhancedMessage = enhanceMessage(message);
+          const success = await sendFacebookMessage(
+            task.cookies,
+            conversation,
+            enhancedMessage,
+            taskId
+          );
+          
+          task.completed++;
+          task.progress = Math.round((task.completed / task.total) * 100);
+          
+          if (success) {
+            task.success++;
+          } else {
+            task.failed++;
+          }
+          
+          // Update progress
+          tasks.set(taskId, task);
+          
+          // Delay between messages
+          if (task.completed < task.total) {
+            await new Promise(resolve => 
+              setTimeout(resolve, task.time_delay * 1000)
+            );
+          }
+        }
+      }
+      
+      // Delay between batches
+      if (batch < task.batch_count - 1) {
+        addLog(taskId, `Waiting ${task.batch_delay} seconds before next batch...`);
+        await new Promise(resolve => 
+          setTimeout(resolve, task.batch_delay * 1000)
+        );
+      }
+    }
+    
+    task.status = 'completed';
+    tasks.set(taskId, task);
+    addLog(taskId, `Task completed! Success: ${task.success}, Failed: ${task.failed}`);
+    
+  } catch (error) {
+    task.status = 'error';
+    tasks.set(taskId, task);
+    addLog(taskId, `Task error: ${error.message}`);
+  }
+}
+
+// Cleanup old tasks (older than 24 hours)
+setInterval(() => {
+  const now = new Date();
+  const twentyFourHoursAgo = new Date(now - 24 * 60 * 60 * 1000);
+  
+  for (const [taskId, task] of tasks.entries()) {
+    const taskTime = new Date(task.startTime);
+    if (taskTime < twentyFourHoursAgo) {
+      tasks.delete(taskId);
+      logs.delete(taskId);
+    }
+  }
+}, 60 * 60 * 1000); // Run every hour
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`📡 Development mode enabled`);
+  console.log(`🔗 http://localhost:${PORT}`);
+});
