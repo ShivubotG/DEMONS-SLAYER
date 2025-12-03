@@ -43,21 +43,18 @@ RUN apt-get update && apt-get install -y \
     xdg-utils \
     && rm -rf /var/lib/apt/lists/*
 
+# Install latest chromium
+RUN apt-get update && apt-get install -y chromium \
+    && rm -rf /var/lib/apt/lists/*
+
 # Create app directory
 WORKDIR /usr/src/app
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies - FIXED: Using npm install instead of npm ci if lockfile doesn't exist
-RUN if [ -f package-lock.json ]; then \
-      npm ci --only=production; \
-    else \
-      npm install --only=production; \
-    fi
-
-# Install puppeteer chromium
-RUN npx puppeteer browsers install chrome
+# Install dependencies - USING npm install INSTEAD OF npm ci
+RUN npm install --omit=dev
 
 # Copy app source
 COPY . .
