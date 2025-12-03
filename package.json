@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "express": "5.1.0",
-    "puppeteer",
+    "puppeteer": "24.1.5",
     "express-rate-limit": "7.1.5",
     "cors": "2.8.5",
     "helmet": "7.1.0",
@@ -22,8 +22,8 @@
   },
   "engines": {
     "node": ">=18.0.0",
-    "npm"
-},
+    "npm": ">=9.0.0"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/shivubotG/demons-slayer.git"
