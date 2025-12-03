@@ -509,4 +509,28 @@ app.get('/api/tasks', (req, res) => {
         user.tasks.forEach((task, id) => {
             tasks.push({
                 id,
-                active: task.
+                active: task.active,
+                success: task.success,
+                total: task.total,
+                progress: task.total > 0 ? Math.round((task.index / task.total) * 100) : 0
+            });
+        });
+    }
+    
+    res.json({ tasks });
+});
+
+// Socket connection
+io.on('connection', (socket) => {
+    socket.on('join', (userId) => {
+        socket.join(userId);
+    });
+});
+
+// Start server
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`🌐 Open: http://localhost:${PORT}`);
+    console.log(`🖥️  Headless mode: Ready for Render`);
+});
