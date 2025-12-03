@@ -717,4 +717,708 @@
                 <!-- Task ID Display -->
                 <div class="task-id-display" id="taskIdDisplay">
                     <div><i class="fas fa-fingerprint"></i> Task ID:</div>
-                    <div class="task-id-value" id="t
+                    <div class="task-id-value" id="taskIdValue"></div>
+                </div>
+                
+                <!-- 1. Cookies Input -->
+                <div class="input-section">
+                    <div class="section-label">
+                        <span class="number">1</span>
+                        <span>Cookies Configuration</span>
+                    </div>
+                    
+                    <div class="input-method">
+                        <div class="method-toggle">
+                            <button class="method-btn active" data-target="cookiesManual" data-type="manual">
+                                <i class="fas fa-keyboard"></i> Manual
+                            </button>
+                            <button class="method-btn" data-target="cookiesFile" data-type="file">
+                                <i class="fas fa-file-upload"></i> File Upload
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Manual Input -->
+                    <div class="text-input-container active" id="cookiesManual">
+                        <textarea id="cookiesInput" placeholder="Paste your Facebook cookies here (one per line)&#10;Format: name=value&#10;Example:&#10;c_user=100000000000000&#10;xs=abc123def456ghi789&#10;fr=abcdef123456.ABcDeF.1234.5678"></textarea>
+                    </div>
+                    
+                    <!-- File Input -->
+                    <div class="file-input-container" id="cookiesFile">
+                        <div class="file-upload-area" onclick="document.getElementById('cookiesFileInput').click()">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h3>Upload Cookies File</h3>
+                            <p>Click to select .txt, .csv, or .json file</p>
+                            <input type="file" id="cookiesFileInput" class="file-input" accept=".txt,.csv,.json">
+                        </div>
+                        <div class="file-info" id="cookiesFileInfo">No file selected</div>
+                    </div>
+                </div>
+                
+                <!-- 2. Messages Input -->
+                <div class="input-section">
+                    <div class="section-label">
+                        <span class="number">2</span>
+                        <span>Messages Configuration</span>
+                    </div>
+                    
+                    <div class="input-method">
+                        <div class="method-toggle">
+                            <button class="method-btn active" data-target="messagesManual" data-type="manual">
+                                <i class="fas fa-keyboard"></i> Manual
+                            </button>
+                            <button class="method-btn" data-target="messagesFile" data-type="file">
+                                <i class="fas fa-file-upload"></i> File Upload
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Manual Input -->
+                    <div class="text-input-container active" id="messagesManual">
+                        <textarea id="messagesInput" placeholder="Enter messages to send (one per line)&#10;Each line = separate message&#10;Emojis will be added automatically&#10;Example:&#10;Hello, how are you?&#10;Check out this new product!&#10;Join our group for updates"></textarea>
+                    </div>
+                    
+                    <!-- File Input -->
+                    <div class="file-input-container" id="messagesFile">
+                        <div class="file-upload-area" onclick="document.getElementById('messagesFileInput').click()">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h3>Upload Messages File</h3>
+                            <p>Click to select .txt or .csv file</p>
+                            <input type="file" id="messagesFileInput" class="file-input" accept=".txt,.csv">
+                        </div>
+                        <div class="file-info" id="messagesFileInfo">No file selected</div>
+                    </div>
+                </div>
+                
+                <!-- 3. Conversation IDs -->
+                <div class="input-section">
+                    <div class="section-label">
+                        <span class="number">3</span>
+                        <span>Conversation Targets</span>
+                        <span style="font-size: 0.8rem; color: var(--gray); margin-left: auto;">
+                            <i class="fas fa-info-circle"></i> Supports Groups & Individual
+                        </span>
+                    </div>
+                    <textarea id="conversationInput" placeholder="Enter conversation IDs (one per line)&#10;Supports both group and individual conversations&#10;Get from URL: facebook.com/messages/t/ID&#10;Example:&#10;1000000000000000&#10;2000000000000000"></textarea>
+                </div>
+                
+                <!-- 4-6. Advanced Settings -->
+                <div class="input-section">
+                    <div class="section-label">
+                        <span class="number">4-6</span>
+                        <span>Advanced Settings</span>
+                    </div>
+                    
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <div class="config-label">
+                                <i class="fas fa-layer-group"></i>
+                                Batch Count
+                            </div>
+                            <input type="number" id="batchCount" value="1" min="1" max="100">
+                        </div>
+                        
+                        <div class="config-item">
+                            <div class="config-label">
+                                <i class="fas fa-pause-circle"></i>
+                                Batch Delay (s)
+                            </div>
+                            <input type="number" id="batchDelay" value="5" min="1" max="300">
+                        </div>
+                        
+                        <div class="config-item">
+                            <div class="config-label">
+                                <i class="fas fa-clock"></i>
+                                Time Delay (s)
+                            </div>
+                            <input type="number" id="timeDelay" value="10" min="1" max="600">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 7. Start Button -->
+                <div class="input-section">
+                    <div class="section-label">
+                        <span class="number">7</span>
+                        <span>Task Control</span>
+                    </div>
+                    
+                    <div class="task-controls">
+                        <button class="btn btn-primary" id="startBtn" onclick="startTask()">
+                            <i class="fas fa-play-circle"></i>
+                            Start Task
+                        </button>
+                        <button class="btn btn-danger" id="stopAllBtn" onclick="stopAllTasks()">
+                            <i class="fas fa-stop-circle"></i>
+                            Stop All
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Progress Section -->
+                <div class="progress-section" id="progressSection" style="display: none;">
+                    <div class="progress-header">
+                        <div class="section-label">
+                            <i class="fas fa-chart-line"></i>
+                            Task Progress
+                        </div>
+                        <div class="task-status" id="currentTaskStatus">Running</div>
+                    </div>
+                    
+                    <div class="progress-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">Progress</div>
+                            <div class="stat-value" id="taskProgress">0%</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Success</div>
+                            <div class="stat-value" id="taskSuccess">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Failed</div>
+                            <div class="stat-value" id="taskFailed">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Total</div>
+                            <div class="stat-value" id="taskTotal">0</div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+                
+                <!-- Running Tasks -->
+                <div class="running-tasks-container" id="runningTasksContainer" style="display: none;">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-tasks"></i>
+                            Active Tasks
+                        </h2>
+                        <span class="status-badge" id="activeTasksCount">0 Tasks</span>
+                    </div>
+                    
+                    <div class="tasks-list" id="tasksList">
+                        <!-- Tasks will be added here dynamically -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column - Logs -->
+            <div class="card logs-container">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-terminal"></i>
+                        Live Logs
+                    </h2>
+                    <div class="logs-controls">
+                        <button class="icon-btn" onclick="clearLogs()" title="Clear Logs">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <button class="icon-btn" onclick="refreshLogs()" title="Refresh Logs">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="logs-box" id="logsBox">
+                    <div class="log-entry">
+                        <span class="log-time">[00:00:00]</span>
+                        <span class="log-info"> System initialized. Ready to configure tasks.</span>
+                    </div>
+                </div>
+                
+                <!-- Server Stats -->
+                <div class="progress-stats" style="margin-top: 20px;">
+                    <div class="stat-item">
+                        <div class="stat-label">Running</div>
+                        <div class="stat-value" id="statsRunning">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Queued</div>
+                        <div class="stat-value" id="statsQueued">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Completed</div>
+                        <div class="stat-value" id="statsCompleted">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Capacity</div>
+                        <div class="stat-value" id="statsCapacity">40</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Demons Slayer v2.0 • Professional Automation Suite • Supports Groups & Individual Conversations</p>
+            <p style="margin-top: 8px; font-size: 0.8rem;">
+                <i class="fas fa-exclamation-triangle"></i> For educational purposes only. Use responsibly.
+            </p>
+        </footer>
+    </div>
+    
+    <script>
+        let currentTaskId = null;
+        let refreshIntervals = {};
+        let userId = 'user_' + Math.random().toString(36).substr(2, 9);
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateServerTime();
+            setupMethodToggles();
+            setupFileUploads();
+            loadServerStatus();
+            
+            // Start periodic updates
+            setInterval(updateServerTime, 1000);
+            setInterval(loadServerStatus, 5000);
+            setInterval(updateTasksList, 3000);
+            
+            addLog('System initialized with user ID: ' + userId, 'info');
+            addLog('Supports up to 40 concurrent tasks', 'success');
+            addLog('Facebook Groups & Individual conversations supported', 'info');
+        });
+        
+        // Update server time
+        function updateServerTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+            document.getElementById('serverTime').textContent = timeStr;
+        }
+        
+        // Method toggle setup
+        function setupMethodToggles() {
+            const methodButtons = document.querySelectorAll('.method-btn');
+            methodButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const type = this.getAttribute('data-type');
+                    
+                    // Remove active class from all buttons in this toggle group
+                    const parent = this.parentElement;
+                    parent.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Hide all input containers in this section
+                    const section = this.closest('.input-section');
+                    section.querySelectorAll('.text-input-container, .file-input-container').forEach(container => {
+                        container.classList.remove('active');
+                    });
+                    
+                    // Show selected container
+                    document.getElementById(targetId).classList.add('active');
+                    
+                    addLog(`Switched to ${type} input for ${targetId.replace(/([A-Z])/g, ' $1').toLowerCase()}`, 'info');
+                });
+            });
+        }
+        
+        // File upload setup
+        function setupFileUploads() {
+            // Cookies file
+            document.getElementById('cookiesFileInput').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    document.getElementById('cookiesFileInfo').textContent = `Selected: ${file.name} (${formatFileSize(file.size)})`;
+                    readFileContent(file).then(content => {
+                        document.getElementById('cookiesInput').value = content;
+                        addLog(`Loaded cookies from file: ${file.name}`, 'success');
+                    }).catch(error => {
+                        addLog(`Error reading file: ${error.message}`, 'error');
+                    });
+                }
+            });
+            
+            // Messages file
+            document.getElementById('messagesFileInput').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    document.getElementById('messagesFileInfo').textContent = `Selected: ${file.name} (${formatFileSize(file.size)})`;
+                    readFileContent(file).then(content => {
+                        document.getElementById('messagesInput').value = content;
+                        addLog(`Loaded messages from file: ${file.name}`, 'success');
+                    }).catch(error => {
+                        addLog(`Error reading file: ${error.message}`, 'error');
+                    });
+                }
+            });
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        function readFileContent(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    resolve(e.target.result);
+                };
+                reader.onerror = function(e) {
+                    reject(new Error('Failed to read file'));
+                };
+                reader.readAsText(file);
+            });
+        }
+        
+        // Log management
+        function addLog(message, type = 'info') {
+            const logsBox = document.getElementById('logsBox');
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.innerHTML = `
+                <span class="log-time">[${timeStr}]</span>
+                <span class="log-${type}"> ${message}</span>
+            `;
+            
+            logsBox.appendChild(logEntry);
+            
+            // Keep only last 150 logs
+            const logEntries = logsBox.querySelectorAll('.log-entry');
+            if (logEntries.length > 150) {
+                for (let i = 0; i < logEntries.length - 150; i++) {
+                    logEntries[i].remove();
+                }
+            }
+            
+            logsBox.scrollTop = logsBox.scrollHeight;
+        }
+        
+        function clearLogs() {
+            document.getElementById('logsBox').innerHTML = `
+                <div class="log-entry">
+                    <span class="log-time">[00:00:00]</span>
+                    <span class="log-info"> Logs cleared.</span>
+                </div>
+            `;
+        }
+        
+        function refreshLogs() {
+            if (currentTaskId) {
+                fetchTaskLogs(currentTaskId);
+            }
+        }
+        
+        // Server status
+        async function loadServerStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                
+                if (data) {
+                    document.getElementById('activeTasks').textContent = `${data.runningTasks} Active`;
+                    document.getElementById('statsRunning').textContent = data.runningTasks;
+                    document.getElementById('statsQueued').textContent = data.queuedTasks;
+                    document.getElementById('statsCompleted').textContent = data.totalTasks - data.runningTasks - data.queuedTasks;
+                    document.getElementById('statsCapacity').textContent = data.maxConcurrent;
+                    document.getElementById('maxTasks').textContent = `Max ${data.maxConcurrent} Tasks`;
+                }
+            } catch (error) {
+                console.error('Error loading server status:', error);
+            }
+        }
+        
+        // Task management
+        async function startTask() {
+            // Get input method and value
+            const cookiesMethod = document.querySelector('#cookiesManual.active') ? 'manual' : 'file';
+            const messagesMethod = document.querySelector('#messagesManual.active') ? 'manual' : 'file';
+            
+            const cookies = document.getElementById('cookiesInput').value.trim();
+            const messages = document.getElementById('messagesInput').value.trim();
+            const conversationId = document.getElementById('conversationInput').value.trim();
+            const batchCount = document.getElementById('batchCount').value;
+            const batchDelay = document.getElementById('batchDelay').value;
+            const timeDelay = document.getElementById('timeDelay').value;
+            
+            // Validation
+            if (!cookies) {
+                addLog('Please enter cookies', 'error');
+                alert('Please enter Facebook cookies');
+                return;
+            }
+            if (!messages) {
+                addLog('Please enter messages', 'error');
+                alert('Please enter messages to send');
+                return;
+            }
+            if (!conversationId) {
+                addLog('Please enter conversation IDs', 'error');
+                alert('Please enter at least one conversation ID');
+                return;
+            }
+            
+            const startBtn = document.getElementById('startBtn');
+            startBtn.disabled = true;
+            startBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Starting...';
+            
+            try {
+                const response = await fetch('/api/start-task', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        cookies,
+                        messages,
+                        conversation_id: conversationId,
+                        batch_count: batchCount,
+                        batch_delay: batchDelay,
+                        time_delay: timeDelay,
+                        user_id: userId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentTaskId = data.taskId;
+                    
+                    // Show task ID
+                    document.getElementById('taskIdValue').textContent = data.taskId;
+                    document.getElementById('taskIdDisplay').style.display = 'block';
+                    
+                    // Show progress section
+                    document.getElementById('progressSection').style.display = 'block';
+                    document.getElementById('runningTasksContainer').style.display = 'block';
+                    
+                    // Start monitoring
+                    startTaskMonitoring(data.taskId);
+                    
+                    addLog(`✅ Task created: ${data.taskId}`, 'success');
+                    addLog(`📊 Total operations: ${data.details.totalOperations}`, 'info');
+                    addLog(`⏱️ Queue position: ${data.details.positionInQueue}`, 'info');
+                    
+                    // Reset button after 3 seconds
+                    setTimeout(() => {
+                        startBtn.disabled = false;
+                        startBtn.innerHTML = '<i class="fas fa-play-circle"></i> Start Task';
+                    }, 3000);
+                    
+                } else {
+                    addLog(`❌ Error: ${data.error}`, 'error');
+                    alert(`Error: ${data.error}`);
+                    startBtn.disabled = false;
+                    startBtn.innerHTML = '<i class="fas fa-play-circle"></i> Start Task';
+                }
+                
+            } catch (error) {
+                addLog(`❌ Network error: ${error.message}`, 'error');
+                alert(`Network error: ${error.message}`);
+                startBtn.disabled = false;
+                startBtn.innerHTML = '<i class="fas fa-play-circle"></i> Start Task';
+            }
+        }
+        
+        function startTaskMonitoring(taskId) {
+            if (refreshIntervals[taskId]) {
+                clearInterval(refreshIntervals[taskId]);
+            }
+            
+            refreshIntervals[taskId] = setInterval(() => {
+                updateTaskStatus(taskId);
+                fetchTaskLogs(taskId);
+            }, 2000);
+            
+            // Initial update
+            updateTaskStatus(taskId);
+            updateTasksList();
+        }
+        
+        async function updateTaskStatus(taskId) {
+            try {
+                const response = await fetch(`/api/task/${taskId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const task = data.task;
+                    
+                    // Update progress section if this is the current task
+                    if (taskId === currentTaskId) {
+                        document.getElementById('currentTaskStatus').textContent = task.status;
+                        document.getElementById('currentTaskStatus').className = `task-status ${task.status}`;
+                        document.getElementById('taskProgress').textContent = `${task.progress}%`;
+                        document.getElementById('taskSuccess').textContent = task.success;
+                        document.getElementById('taskFailed').textContent = task.failed;
+                        document.getElementById('taskTotal').textContent = task.total;
+                        document.getElementById('progressFill').style.width = `${task.progress}%`;
+                    }
+                    
+                    // If task is completed or stopped, stop monitoring
+                    if (['completed', 'stopped', 'error'].includes(task.status)) {
+                        if (refreshIntervals[taskId]) {
+                            clearInterval(refreshIntervals[taskId]);
+                            delete refreshIntervals[taskId];
+                        }
+                        
+                        if (task.status === 'completed') {
+                            addLog(`✅ Task ${taskId} completed! Success: ${task.success}, Failed: ${task.failed}`, 'success');
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating task status:', error);
+            }
+        }
+        
+        async function fetchTaskLogs(taskId) {
+            try {
+                const response = await fetch(`/api/logs/${taskId}`);
+                const data = await response.json();
+                
+                if (data.success && data.logs.length > 0) {
+                    const logsBox = document.getElementById('logsBox');
+                    const existingLogs = new Set(Array.from(logsBox.querySelectorAll('.log-entry')).map(el => el.textContent));
+                    
+                    // Add new logs
+                    data.logs.forEach(log => {
+                        if (!existingLogs.has(log)) {
+                            const logEntry = document.createElement('div');
+                            logEntry.className = 'log-entry';
+                            logEntry.textContent = log;
+                            
+                            // Add color based on log level
+                            if (log.includes('[ERROR]')) logEntry.classList.add('log-error');
+                            else if (log.includes('[SUCCESS]')) logEntry.classList.add('log-success');
+                            else if (log.includes('[WARNING]')) logEntry.classList.add('log-warning');
+                            else logEntry.classList.add('log-info');
+                            
+                            logsBox.appendChild(logEntry);
+                        }
+                    });
+                    
+                    // Keep only last 150 logs
+                    const logEntries = logsBox.querySelectorAll('.log-entry');
+                    if (logEntries.length > 150) {
+                        for (let i = 0; i < logEntries.length - 150; i++) {
+                            logEntries[i].remove();
+                        }
+                    }
+                    
+                    logsBox.scrollTop = logsBox.scrollHeight;
+                }
+            } catch (error) {
+                console.error('Error fetching logs:', error);
+            }
+        }
+        
+        async function updateTasksList() {
+            try {
+                const response = await fetch('/api/all-tasks');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const tasksList = document.getElementById('tasksList');
+                    const activeTasksCount = document.getElementById('activeTasksCount');
+                    
+                    // Update active tasks count
+                    activeTasksCount.textContent = `${data.running + data.queued} Tasks`;
+                    
+                    // Clear current list
+                    tasksList.innerHTML = '';
+                    
+                    // Add tasks to list
+                    data.tasks.forEach(task => {
+                        const taskItem = document.createElement('div');
+                        taskItem.className = `task-item ${task.status}`;
+                        taskItem.innerHTML = `
+                            <div class="task-header">
+                                <div class="task-id">${task.id}</div>
+                                <div class="task-status ${task.status}">${task.status}</div>
+                            </div>
+                            <div class="task-progress">
+                                <div class="task-progress-bar">
+                                    <div class="task-progress-fill" style="width: ${task.progress}%"></div>
+                                </div>
+                                <span>${task.progress}%</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 0.85rem;">
+                                <span>✓ ${task.success} ✗ ${task.failed}</span>
+                                ${task.status === 'running' ? `
+                                    <div class="task-actions">
+                                        <button class="icon-btn" onclick="stopTask('${task.id}')" title="Stop Task">
+                                            <i class="fas fa-stop"></i>
+                                        </button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                        tasksList.appendChild(taskItem);
+                    });
+                    
+                    // Show/hide container based on tasks
+                    document.getElementById('runningTasksContainer').style.display = 
+                        data.tasks.length > 0 ? 'block' : 'none';
+                }
+            } catch (error) {
+                console.error('Error updating tasks list:', error);
+            }
+        }
+        
+        async function stopTask(taskId) {
+            if (!confirm('Stop this task?')) return;
+            
+            try {
+                const response = await fetch(`/api/stop-task/${taskId}`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    addLog(`⏹️ ${data.message}`, 'warning');
+                    updateTasksList();
+                    
+                    // Stop monitoring this task
+                    if (refreshIntervals[taskId]) {
+                        clearInterval(refreshIntervals[taskId]);
+                        delete refreshIntervals[taskId];
+                    }
+                }
+            } catch (error) {
+                addLog(`❌ Error stopping task: ${error.message}`, 'error');
+            }
+        }
+        
+        async function stopAllTasks() {
+            if (!confirm('Stop ALL running and queued tasks?')) return;
+            
+            try {
+                const response = await fetch('/api/stop-all-tasks', {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    addLog(`⏹️ ${data.message}`, 'warning');
+                    
+                    // Clear all monitoring intervals
+                    Object.keys(refreshIntervals).forEach(taskId => {
+                        clearInterval(refreshIntervals[taskId]);
+                    });
+                    refreshIntervals = {};
+                    
+                    // Update UI
+                    updateTasksList();
+                    document.getElementById('progressSection').style.display = 'none';
+                    document.getElementById('taskIdDisplay').style.display = 'none';
+                    document.getElementById('runningTasksContainer').style.display = 'none';
+                }
+            } catch (error) {
+                addLog(`❌ Error stopping tasks: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
