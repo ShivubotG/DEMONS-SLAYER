@@ -571,4 +571,190 @@
             const stopBtn = document.getElementById('stopBtn');
             
             startBtn.disabled = true;
-            startBtn.innerHTML = '<i class="fas fa-spinn
+            startBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Starting...';
+            
+            try {
+                const response = await fetch('/api/start-task', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        cookies,
+                        messages,
+                        conversation_id: conversationId,
+                        batch_count: batchCount,
+                        batch_delay: batchDelay,
+                        time_delay: timeDelay
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentTaskId = data.taskId;
+                    
+                    // Show task ID
+                    document.getElementById('taskIdValue').textContent = data.taskId;
+                    document.getElementById('taskIdDisplay').style.display = 'block';
+                    
+                    // Show status bar
+                    document.getElementById('statusBar').style.display = 'flex';
+                    document.getElementById('progressBar').style.display = 'block';
+                    
+                    // Enable stop button
+                    stopBtn.disabled = false;
+                    
+                    // Start refreshing task status
+                    startRefresh();
+                    
+                    addLog(data.message, 'success');
+                    addLog(`Task ID: ${data.taskId}`, 'info');
+                } else {
+                    addLog('Error: ' + data.error, 'error');
+                    startBtn.disabled = false;
+                    startBtn.innerHTML = '<i class="fas fa-play"></i> Start Task';
+                }
+                
+            } catch (error) {
+                addLog('Network error: ' + error.message, 'error');
+                startBtn.disabled = false;
+                startBtn.innerHTML = '<i class="fas fa-play"></i> Start Task';
+            }
+        }
+        
+        async function stopTask() {
+            if (!currentTaskId) return;
+            
+            const stopBtn = document.getElementById('stopBtn');
+            stopBtn.disabled = true;
+            stopBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Stopping...';
+            
+            try {
+                const response = await fetch(`/api/stop-task/${currentTaskId}`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    addLog(data.message, 'warning');
+                    stopRefresh();
+                    
+                    const startBtn = document.getElementById('startBtn');
+                    startBtn.disabled = false;
+                    startBtn.innerHTML = '<i class="fas fa-play"></i> Start Task';
+                    
+                    stopBtn.innerHTML = '<i class="fas fa-stop"></i> Stop Task';
+                }
+            } catch (error) {
+                addLog('Error stopping task: ' + error.message, 'error');
+                stopBtn.disabled = false;
+                stopBtn.innerHTML = '<i class="fas fa-stop"></i> Stop Task';
+            }
+        }
+        
+        function startRefresh() {
+            // Clear existing intervals
+            if (refreshInterval) clearInterval(refreshInterval);
+            if (logRefreshInterval) clearInterval(logRefreshInterval);
+            
+            // Refresh task status every 2 seconds
+            refreshInterval = setInterval(refreshTaskStatus, 2000);
+            
+            // Refresh logs every 3 seconds
+            logRefreshInterval = setInterval(refreshLogs, 3000);
+            
+            // Initial refresh
+            refreshTaskStatus();
+            refreshLogs();
+        }
+        
+        function stopRefresh() {
+            if (refreshInterval) clearInterval(refreshInterval);
+            if (logRefreshInterval) clearInterval(logRefreshInterval);
+        }
+        
+        async function refreshTaskStatus() {
+            if (!currentTaskId) return;
+            
+            try {
+                const response = await fetch(`/api/task/${currentTaskId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const task = data.task;
+                    
+                    document.getElementById('taskStatus').textContent = task.status;
+                    document.getElementById('taskProgress').textContent = task.progress + '%';
+                    document.getElementById('taskSuccess').textContent = task.success;
+                    document.getElementById('taskFailed').textContent = task.failed;
+                    document.getElementById('progressFill').style.width = task.progress + '%';
+                    
+                    // Update task counts
+                    document.getElementById('activeTasks').textContent = 
+                        task.status === 'running' ? '1' : '0';
+                    
+                    // If task is completed or stopped, re-enable start button
+                    if (task.status === 'completed' || task.status === 'stopped' || task.status === 'error') {
+                        const startBtn = document.getElementById('startBtn');
+                        startBtn.disabled = false;
+                        startBtn.innerHTML = '<i class="fas fa-play"></i> Start Task';
+                        
+                        const stopBtn = document.getElementById('stopBtn');
+                        stopBtn.disabled = true;
+                        
+                        // Stop refreshing after a delay
+                        setTimeout(stopRefresh, 5000);
+                    }
+                }
+            } catch (error) {
+                console.error('Error refreshing task status:', error);
+            }
+        }
+        
+        async function refreshLogs() {
+            if (!currentTaskId) return;
+            
+            try {
+                const response = await fetch(`/api/logs/${currentTaskId}`);
+                const data = await response.json();
+                
+                if (data.success && data.logs.length > 0) {
+                    const logsBox = document.getElementById('logsBox');
+                    const lastLog = logsBox.lastChild?.textContent || '';
+                    
+                    // Only add new logs
+                    data.logs.forEach(log => {
+                        if (!lastLog.includes(log)) {
+                            const logEntry = document.createElement('div');
+                            logEntry.className = 'log-entry';
+                            logEntry.textContent = log;
+                            logsBox.appendChild(logEntry);
+                        }
+                    });
+                    
+                    logsBox.scrollTop = logsBox.scrollHeight;
+                }
+            } catch (error) {
+                console.error('Error refreshing logs:', error);
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('System initialized. Ready to start tasks.', 'success');
+            
+            // Check server status
+            fetch('/api/status')
+                .then(response => response.json())
+                .then(data => {
+                    addLog(`Server version: ${data.version}`, 'info');
+                })
+                .catch(err => {
+                    addLog('Warning: Could not connect to server', 'warning');
+                });
+        });
+    </script>
+</body>
+</html>
