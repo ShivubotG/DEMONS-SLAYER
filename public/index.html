@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demons Slayer - Message Automation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --darker: #111827;
+            --light: #f3f4f6;
+            --gray: #6b7280;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.8rem;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            color: var(--primary);
+        }
+        
+        .card-title i {
+            font-size: 1.6rem;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--light);
+            font-weight: 500;
+        }
+        
+        textarea, input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--light);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        textarea:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .file-upload {
+            position: relative;
+            margin-top: 10px;
+        }
+        
+        .file-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: var(--primary);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .file-label:hover {
+            background: var(--primary-dark);
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .config-item input {
+            text-align: center;
+        }
+        
+        .task-id-display {
+            text-align: center;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: var(--secondary);
+            display: none;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(124, 58, 237, 0.3);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .logs-container {
+            margin-top: 30px;
+        }
+        
+        .logs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .logs-box {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .log-entry {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .log-time {
+            color: var(--secondary);
+            font-weight: bold;
+        }
+        
+        .log-info { color: #60a5fa; }
+        .log-success { color: #34d399; }
+        .log-warning { color: #fbbf24; }
+        .log-error { color: #f87171; }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .status-item {
+            text-align: center;
+        }
+        
+        .status-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+        
+        .status-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--light);
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .glow {
+            animation: glow 2s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 0 10px var(--primary); }
+            to { box-shadow: 0 0 20px var(--secondary); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-robot"></i> DEMONS SLAYER</h1>
+            <p class="subtitle">Advanced Message Automation Tool - Development Server</p>
+        </header>
+        
+        <div class="main-content">
+            <!-- Left Column - Inputs -->
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-cogs"></i> Configuration</h2>
+                
+                <div class="task-id-display" id="taskIdDisplay">
+                    Task ID: <span id="taskIdValue"></span>
+                </div>
+                
+                <div class="input-group">
+                    <label><i class="fas fa-cookie-bite"></i> 1. Cookies</label>
+                    <textarea id="cookiesInput" placeholder="Paste cookies here (one per line)&#10;Format: name=value; domain=.facebook.com"></textarea>
+                    <div class="file-upload">
+                        <label class="file-label">
+                            <i class="fas fa-upload"></i> Upload Cookies File
+                            <input type="file" id="cookiesFile" class="file-input" accept=".txt,.csv">
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label><i class="fas fa-comment-dots"></i> 2. Messages</label>
+                    <textarea id="messagesInput" placeholder="Enter messages (one per line)&#10;Each line will be sent as a separate message"></textarea>
+                    <div class="file-upload">
+                        <label class="file-label">
+                            <i class="fas fa-upload"></i> Upload Messages File
+                            <input type="file" id="messagesFile" class="file-input" accept=".txt,.csv">
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label><i class="fas fa-users"></i> 3. Conversation IDs</label>
+                    <textarea id="conversationInput" placeholder="Enter conversation IDs (one per line)&#10;You can get these from Facebook Messenger URLs"></textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label><i class="fas fa-sliders-h"></i> Advanced Settings</label>
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <label>4. Batch Count</label>
+                            <input type="number" id="batchCount" value="1" min="1" max="100">
+                        </div>
+                        <div class="config-item">
+                            <label>5. Batch Delay (s)</label>
+                            <input type="number" id="batchDelay" value="5" min="1" max="300">
+                        </div>
+                        <div class="config-item">
+                            <label>6. Time Delay (s)</label>
+                            <input type="number" id="timeDelay" value="10" min="1" max="600">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="buttons">
+                    <button class="btn btn-primary" id="startBtn" onclick="startTask()">
+                        <i class="fas fa-play"></i> 7. Start Task
+                    </button>
+                    <button class="btn btn-danger" id="stopBtn" onclick="stopTask()" disabled>
+                        <i class="fas fa-stop"></i> Stop Task
+                    </button>
+                </div>
+                
+                <div class="status-bar" id="statusBar" style="display: none;">
+                    <div class="status-item">
+                        <div class="status-label">Status</div>
+                        <div class="status-value" id="taskStatus">Running</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Progress</div>
+                        <div class="status-value" id="taskProgress">0%</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Success</div>
+                        <div class="status-value" id="taskSuccess">0</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Failed</div>
+                        <div class="status-value" id="taskFailed">0</div>
+                    </div>
+                </div>
+                <div class="progress-bar" id="progressBar" style="display: none;">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+            
+            <!-- Right Column - Logs -->
+            <div class="card">
+                <div class="logs-header">
+                    <h2 class="card-title"><i class="fas fa-terminal"></i> Live Logs</h2>
+                    <button class="btn btn-danger" onclick="clearLogs()" style="padding: 8px 15px; font-size: 0.9rem;">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
+                <div class="logs-box" id="logsBox">
+                    <div class="log-entry">
+                        <span class="log-time">[00:00:00]</span>
+                        <span class="log-info"> System ready. Enter configuration and click Start Task.</span>
+                    </div>
+                </div>
+                
+                <div class="status-bar" style="margin-top: 20px;">
+                    <div class="status-item">
+                        <div class="status-label">Active Tasks</div>
+                        <div class="status-value" id="activeTasks">0</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Total Tasks</div>
+                        <div class="status-value" id="totalTasks">0</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">Server Time</div>
+                        <div class="status-value" id="serverTime">00:00:00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Demons Slayer v1.0.0 | Development Server | Not for production use</p>
+            <p style="margin-top: 5px; font-size: 0.8rem;">
+                <i class="fas fa-exclamation-triangle"></i> Use responsibly and comply with Facebook's Terms of Service
+            </p>
+        </footer>
+    </div>
+    
+    <script>
+        let currentTaskId = null;
+        let refreshInterval = null;
+        let logRefreshInterval = null;
+        
+        // Update server time
+        function updateServerTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+            document.getElementById('serverTime').textContent = timeStr;
+        }
+        
+        setInterval(updateServerTime, 1000);
+        updateServerTime();
+        
+        // File upload handlers
+        document.getElementById('cookiesFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                readFile(file).then(content => {
+                    document.getElementById('cookiesInput').value = content;
+                    addLog('Cookies file loaded successfully', 'success');
+                }).catch(err => {
+                    addLog('Error reading cookies file: ' + err.message, 'error');
+                });
+            }
+        });
+        
+        document.getElementById('messagesFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                readFile(file).then(content => {
+                    document.getElementById('messagesInput').value = content;
+                    addLog('Messages file loaded successfully', 'success');
+                }).catch(err => {
+                    addLog('Error reading messages file: ' + err.message, 'error');
+                });
+            }
+        });
+        
+        function readFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    resolve(e.target.result);
+                };
+                reader.onerror = function(e) {
+                    reject(new Error('Failed to read file'));
+                };
+                reader.readAsText(file);
+            });
+        }
+        
+        // Log management
+        function addLog(message, type = 'info') {
+            const logsBox = document.getElementById('logsBox');
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.innerHTML = `
+                <span class="log-time">[${timeStr}]</span>
+                <span class="log-${type}"> ${message}</span>
+            `;
+            
+            logsBox.appendChild(logEntry);
+            logsBox.scrollTop = logsBox.scrollHeight;
+        }
+        
+        function clearLogs() {
+            document.getElementById('logsBox').innerHTML = `
+                <div class="log-entry">
+                    <span class="log-time">[00:00:00]</span>
+                    <span class="log-info"> Logs cleared.</span>
+                </div>
+            `;
+        }
+        
+        // Task management
+        async function startTask() {
+            const cookies = document.getElementById('cookiesInput').value.trim();
+            const messages = document.getElementById('messagesInput').value.trim();
+            const conversationId = document.getElementById('conversationInput').value.trim();
+            const batchCount = document.getElementById('batchCount').value;
+            const batchDelay = document.getElementById('batchDelay').value;
+            const timeDelay = document.getElementById('timeDelay').value;
+            
+            if (!cookies) {
+                addLog('Please enter cookies', 'error');
+                return;
+            }
+            if (!messages) {
+                addLog('Please enter messages', 'error');
+                return;
+            }
+            if (!conversationId) {
+                addLog('Please enter conversation IDs', 'error');
+                return;
+            }
+            
+            const startBtn = document.getElementById('startBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            
+            startBtn.disabled = true;
+            startBtn.innerHTML = '<i class="fas fa-spinn
