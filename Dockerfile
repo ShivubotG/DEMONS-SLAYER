@@ -1,7 +1,7 @@
 # Use Node.js LTS version
-FROM node:18-bullseye
+FROM node:18-bullseye-slim
 
-# Install dependencies for Puppeteer and Chrome
+# Install dependencies for Puppeteer
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
@@ -41,10 +41,8 @@ RUN apt-get update && apt-get install -y \
     libxtst6 \
     lsb-release \
     xdg-utils \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install latest chromium
-RUN apt-get update && apt-get install -y chromium \
+    chromium \
+    chromium-sandbox \
     && rm -rf /var/lib/apt/lists/*
 
 # Create app directory
@@ -53,8 +51,8 @@ WORKDIR /usr/src/app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies - USING npm install INSTEAD OF npm ci
-RUN npm install --omit=dev
+# Install dependencies
+RUN npm ci --omit=dev
 
 # Copy app source
 COPY . .
@@ -68,7 +66,17 @@ RUN groupadd -r appuser && useradd -r -g appuser -G audio,video appuser \
 # Switch to non-root user
 USER appuser
 
+# Set environment variables for Puppeteer
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+ENV CHROME_PATH=/usr/bin/chromium
+ENV CHROMIUM_PATH=/usr/bin/chromium
+
 # Expose port
+EXPOSE 3000
+
+# Start the application
+CMD [ "node", "server.js" ]# Expose port
 EXPOSE 3000
 
 # Start the application
