@@ -76,8 +76,4 @@ ENV CHROMIUM_PATH=/usr/bin/chromium
 EXPOSE 3000
 
 # Start the application
-CMD [ "node", "server.js" ]# Expose port
-EXPOSE 3000
-
-# Start the application
-CMD [ "npm", "run", "dev" ]
+CMD [ "node", "server.js" ]
